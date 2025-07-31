@@ -28,10 +28,25 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      - name: Generate tag
+        id: tag
+        run: |
+          echo "tag=v$(date +'%Y.%m.%d_%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Create tag
+        run: |
+          git tag ${{ steps.tag.outputs.tag }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
           generate_release_notes: true
+          tag_name: ${{ steps.tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
