@@ -6,6 +6,9 @@ class SupabaseService {
   SupabaseService._internal();
 
   late final SupabaseClient _client;
+  String? _firstName;
+
+  String? get firstName => _firstName;
 
   Future<void> initialize(String url, String anonKey) async {
     await Supabase.initialize(
@@ -51,10 +54,16 @@ class SupabaseService {
         throw Exception('Username is already taken');
       }
 
-      // Create auth user
+      // Create auth user with auto-confirmation
       final authResponse = await _client.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'username': username,
+          'full_name': '$firstName $lastName',
+          'phone': phoneNumber,
+          'email_confirm': true
+        },
       );
 
       if (authResponse.user == null) {
@@ -83,5 +92,56 @@ class SupabaseService {
 
   Future<void> signOut() async {
     await _client.auth.signOut();
+    _firstName = null;
+  }
+
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      print('Attempting to login with username: $username');
+
+      // Get user details from accounts table
+      final List<dynamic> records = await _client
+          .from('accounts')
+          .select('email, first_name')
+          .eq('username', username)
+          .limit(1);
+
+      print('Found records: ${records.length}');
+
+      if (records.isEmpty) {
+        print('No user found with username: $username');
+        throw Exception('Username not found');
+      }
+
+      final userRecord = records.first;
+      final email = userRecord['email'] as String;
+
+      // Sign in with email/password (required by Supabase)
+      try {
+        final response = await _client.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+
+        if (response.user == null) {
+          throw Exception('Invalid credentials');
+        }
+
+        // Store the first name
+        _firstName = userRecord['first_name'] as String;
+        print('Login successful for user: $username');
+      } catch (e) {
+        print('Auth error: $e');
+        // Always show invalid password regardless of the actual error
+        throw Exception('Invalid username or password');
+      }
+
+    } catch (e) {
+      print('Error in login: $e');
+      rethrow;
+    }
   }
 }

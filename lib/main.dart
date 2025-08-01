@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'services/supabase_service.dart';
 import 'pages/signup_page.dart';
 import 'pages/home_page.dart';
+import 'pages/login_page.dart';
 
 // Supabase credentials
 const supabaseUrl = 'https://kgdiaceernjantbiqqnf.supabase.co';
@@ -34,8 +35,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      initialRoute: '/signup',
+      initialRoute: '/login',
       routes: {
+        '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
         '/home': (context) => const HomePage(),
       },

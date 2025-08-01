@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
             onPressed: () async {
               await SupabaseService().signOut();
               if (context.mounted) {
-                Navigator.of(context).pushReplacementNamed('/signup');
+                Navigator.of(context).pushReplacementNamed('/login');
               }
             },
           ),
@@ -28,9 +28,13 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                'Hello ${SupabaseService().firstName ?? 'User'}!',
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const Text(
                 'Welcome to BrokeNoMore!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               const Text(

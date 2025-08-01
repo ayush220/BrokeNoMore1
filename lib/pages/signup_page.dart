@@ -66,7 +66,13 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       // Navigate to home page
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.of(context).pushReplacementNamed('/login');
       }
     } catch (e) {
       if (!mounted) return;
